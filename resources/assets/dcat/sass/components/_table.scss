@@ -311,4 +311,35 @@ body.dark-mode {
   }
 }
 
+@media screen and (max-width: 600px) {
+  table.table-column thead {
+    display: none;
+  }
+
+  table.table-column tr {
+    padding: 5px;
+    display: block;
+    margin: .5rem 0 1rem;
+    background-color: #fff;
+    border-radius: 2px;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .16), 0 2px 10px 0 rgba(0, 0, 0, .12);
+  }
+
+  table.table-column td {
+    display: block;
+    text-align: right;
+    border-bottom: 1px dotted #ccc;
+  }
+
+  table.table-column td:last-child {
+    border-bottom: 0;
+  }
+
+  table.table-column td:before {
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+  }
+}
+
 @include scrollbar('.column-selector .selectors')

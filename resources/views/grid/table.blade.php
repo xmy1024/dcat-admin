@@ -1,4 +1,3 @@
-
 <div class="dcat-box">
 
     <div class="d-block pb-0">
@@ -9,8 +8,8 @@
 
     {!! $grid->renderHeader() !!}
 
-    <div class="table-responsive {{ $grid->option('table_collapse') ? 'table-collapse' : '' }} table-wrapper complex-container table-middle mt-1">
-        <table class="{{ $grid->formatTableClass() }}" id="{{ $tableId }}" >
+    <div class="table-column {{ $grid->option('table_collapse') ? 'table-collapse' : '' }} table-wrapper complex-container table-middle mt-1">
+        <table class="{{ $grid->formatTableClass() }} table-column" id="{{ $tableId }}">
             <thead>
             @if ($headers = $grid->getVisibleComplexHeaders())
                 <tr>
@@ -21,7 +20,7 @@
             @endif
             <tr>
                 @foreach($grid->getVisibleColumns() as $column)
-                    <th {!! $column->formatTitleAttributes() !!}>{!! $column->getLabel() !!}{!! $column->renderHeader() !!}</th>
+                    <th id="{!! $column->getName() !!}" {!! $column->formatTitleAttributes() !!}>{!! $column->getLabel() !!}{!! $column->renderHeader() !!}</th>
                 @endforeach
             </tr>
             </thead>
@@ -34,7 +33,8 @@
             @foreach($grid->rows() as $row)
                 <tr {!! $row->rowAttributes() !!}>
                     @foreach($grid->getVisibleColumnNames() as $name)
-                        <td {!! $row->columnAttributes($name) !!}>
+                        <td headers="{!! $name !!}"
+                            @if($name!="__row_selector__") data-label="{!! $grid->getVisibleColumns()[$name]->getLabel() !!}"@endif {!! $row->columnAttributes($name) !!}>
                             {!! $row->column($name) !!}
                         </td>
                     @endforeach
@@ -43,7 +43,9 @@
             @if ($grid->rows()->isEmpty())
                 <tr>
                     <td colspan="{!! count($grid->getVisibleColumnNames()) !!}">
-                        <div style="margin:5px 0 0 10px;"><span class="help-block" style="margin-bottom:0"><i class="feather icon-alert-circle"></i>&nbsp;{{ trans('admin.no_data') }}</span></div>
+                        <div style="margin:5px 0 0 10px;"><span class="help-block" style="margin-bottom:0"><i
+                                        class="feather icon-alert-circle"></i>&nbsp;{{ trans('admin.no_data') }}</span>
+                        </div>
                     </td>
                 </tr>
             @endif
