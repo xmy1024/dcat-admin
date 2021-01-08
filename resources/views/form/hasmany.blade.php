@@ -1,5 +1,5 @@
 
-<div class="row">
+<div class="row" style="margin-top: 10px;">
     <div class="{{$viewClass['label']}}"><h4 class="pull-right">{!! $label !!}</h4></div>
     <div class="{{$viewClass['field']}}"></div>
 </div>
@@ -14,9 +14,7 @@
 
             <div class="has-many-{{$columnClass}}-form fields-group">
 
-                @foreach($form->fields() as $field)
-                    {!! $field->render() !!}
-                @endforeach
+                {!! $form->render() !!}
 
                 @if($options['allowDelete'])
                 <div class="form-group row">

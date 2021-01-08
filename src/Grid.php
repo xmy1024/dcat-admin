@@ -107,9 +107,9 @@ class Grid
     /**
      * Default primary key name.
      *
-     * @var string
+     * @var string|array
      */
-    protected $keyName = 'id';
+    protected $keyName;
 
     /**
      * View for grid to render.
@@ -119,14 +119,14 @@ class Grid
     protected $view = 'admin::grid.table';
 
     /**
-     * @var Closure
+     * @var Closure[]
      */
-    protected $header;
+    protected $header = [];
 
     /**
-     * @var Closure
+     * @var Closure[]
      */
-    protected $footer;
+    protected $footer = [];
 
     /**
      * @var Closure
@@ -177,6 +177,11 @@ class Grid
     protected $request;
 
     /**
+     * @var bool
+     */
+    protected $show = true;
+
+    /**
      * Create a new grid instance.
      *
      * Grid constructor.
@@ -219,11 +224,11 @@ class Grid
     /**
      * Set primary key name.
      *
-     * @param string $name
+     * @param string|array $name
      *
      * @return $this
      */
-    public function setKeyName(string $name)
+    public function setKeyName($name)
     {
         $this->keyName = $name;
 
@@ -233,7 +238,7 @@ class Grid
     /**
      * Get or set primary key name.
      *
-     * @return string|void
+     * @return string|array
      */
     public function getKeyName()
     {
@@ -409,22 +414,20 @@ class Grid
             return;
         }
 
-        $collection = $this->processFilter(false);
-
-        $data = $collection->toArray();
+        $collection = clone $this->processFilter();
 
         $this->prependRowSelectorColumn();
         $this->appendActionsColumn();
 
         Column::setOriginalGridModels($collection);
 
-        $this->columns->map(function (Column $column) use (&$data) {
-            $column->fill($data);
+        $this->columns->map(function (Column $column) use (&$collection) {
+            $column->fill($collection);
 
             $this->columnNames[] = $column->getName();
         });
 
-        $this->buildRows($data);
+        $this->buildRows($collection);
 
         $this->sortHeaders();
     }
@@ -444,14 +447,14 @@ class Grid
     /**
      * Build the grid rows.
      *
-     * @param array $data
+     * @param Collection $data
      *
      * @return void
      */
-    protected function buildRows(array $data)
+    protected function buildRows($data)
     {
-        $this->rows = collect($data)->map(function ($model) {
-            return new Row($this, $model);
+        $this->rows = $data->map(function ($row) {
+            return new Row($this, $row);
         });
 
         foreach ($this->rowsCallbacks as $callback) {
@@ -582,15 +585,11 @@ class Grid
      *
      * @param Closure|string|Renderable $content
      *
-     * @return $this|Closure
+     * @return $this
      */
-    public function header($content = null)
+    public function header($content)
     {
-        if (! $content) {
-            return $this->header;
-        }
-
-        $this->header = $content;
+        $this->header[] = $content;
 
         return $this;
     }
@@ -606,15 +605,25 @@ class Grid
             return '';
         }
 
-        $content = Helper::render($this->header, [$this->processFilter(false)]);
+        return <<<HTML
+<div class="card-header clearfix" style="border-bottom: 0;background: transparent;padding: 0">{$this->renderHeaderOrFooter($this->header)}</div>
+HTML;
+    }
+
+    protected function renderHeaderOrFooter($callbacks)
+    {
+        $target = [$this->processFilter()];
+        $content = [];
+
+        foreach ($callbacks as $callback) {
+            $content[] = Helper::render($callback, $target);
+        }
 
         if (empty($content)) {
             return '';
         }
 
-        return <<<HTML
-<div class="card-header clearfix" style="border-bottom: 0;background: transparent;padding: 0"><div class="col-md-12">{$content}</div></div>
-HTML;
+        return implode('<div class="mb-1 clearfix"></div>', $content);
     }
 
     /**
@@ -622,15 +631,11 @@ HTML;
      *
      * @param Closure|string|Renderable $content
      *
-     * @return $this|Closure
+     * @return $this
      */
-    public function footer($content = null)
+    public function footer($content)
     {
-        if (! $content) {
-            return $this->footer;
-        }
-
-        $this->footer = $content;
+        $this->footer[] = $content;
 
         return $this;
     }
@@ -646,14 +651,8 @@ HTML;
             return '';
         }
 
-        $content = Helper::render($this->footer, [$this->processFilter(false)]);
-
-        if (empty($content)) {
-            return '';
-        }
-
         return <<<HTML
-<div class="box-footer clearfix">{$content}</div>
+<div class="box-footer clearfix">{$this->renderHeaderOrFooter($this->footer)}</div>
 HTML;
     }
 
@@ -883,6 +882,20 @@ HTML;
     }
 
     /**
+     * 设置是否显示.
+     *
+     * @param bool $value
+     *
+     * @return $this
+     */
+    public function show(bool $value = true)
+    {
+        $this->show = $value;
+
+        return $this;
+    }
+
+    /**
      * Get the string contents of the grid view.
      *
      * @return string
@@ -905,6 +918,10 @@ HTML;
      */
     protected function doWrap()
     {
+        if (! $this->show) {
+            return;
+        }
+
         $view = view($this->view, $this->variables());
 
         if (! $wrapper = $this->wrapper) {

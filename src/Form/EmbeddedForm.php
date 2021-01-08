@@ -38,7 +38,7 @@ use Illuminate\Support\Collection;
  * @method Field\SwitchField            switch($column, $label = '')
  * @method Field\Display                display($column, $label = '')
  * @method Field\Rate                   rate($column, $label = '')
- * @method Field\Divide                 divider()
+ * @method Field\Divide                 divider(string $title = null)
  * @method Field\Password               password($column, $label = '')
  * @method Field\Decimal                decimal($column, $label = '')
  * @method Field\Html                   html($html, $label = '')
@@ -247,7 +247,7 @@ class EmbeddedForm
 
         if (is_array($jsonKey)) {
             foreach ($jsonKey as $index => $name) {
-                $elementName[$index] = $this->formatName("{$this->column}").$name;
+                $elementName[$index] = $this->formatName("{$this->column}.{$name}");
                 $errorKey[$index] = "{$this->column}.$name";
                 $elementClass[$index] = $this->formatClass("{$this->column}_$name");
             }

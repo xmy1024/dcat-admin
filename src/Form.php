@@ -58,7 +58,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @method Field\SwitchField            switch($column, $label = '')
  * @method Field\Display                display($column, $label = '')
  * @method Field\Rate                   rate($column, $label = '')
- * @method Field\Divide                 divider()
+ * @method Field\Divide                 divider(string $title = null)
  * @method Field\Password               password($column, $label = '')
  * @method Field\Decimal                decimal($column, $label = '')
  * @method Field\Html                   html($html, $label = '')
@@ -314,7 +314,7 @@ class Form implements Renderable
     {
         $field->setForm($this);
 
-        $this->builder->fields()->push($field);
+        $this->builder->pushField($field);
         $this->builder->layout()->addField($field);
 
         $width = $this->builder->getWidth();
@@ -642,9 +642,11 @@ class Form implements Renderable
                 );
             }
 
+            $url = $this->getRedirectUrl($id, $redirectTo);
+
             return $this->sendResponse(
                 $this->response()
-                    ->redirect($this->getRedirectUrl($id, $redirectTo))
+                    ->redirectIf($url !== false, $url)
                     ->success(trans('admin.save_succeeded'))
             );
         } catch (\Throwable $e) {
@@ -814,10 +816,13 @@ class Form implements Renderable
                 );
             }
 
+            $url = $this->getRedirectUrl($id, $redirectTo);
+
             return $this->sendResponse(
                 $this->response()
                     ->success(trans('admin.update_succeeded'))
-                    ->redirect($this->getRedirectUrl($id, $redirectTo))
+                    ->redirectIf($url !== false, $url)
+                    ->refreshIf($url === false)
             );
         } catch (\Throwable $e) {
             $response = $this->handleException($e);
@@ -926,13 +931,12 @@ class Form implements Renderable
             return $redirectTo;
         }
 
-        $resourcesPath = $this->builder->isCreating() ?
-            $this->resource(0) : $this->resource(-1);
+        $resourcesPath = $this->isCreating() ? $this->resource(0) : $this->resource(-1);
 
         if ($this->request->get('after-save') == 1) {
             // continue editing
             if ($this->builder->isEditing()) {
-                return;
+                return false;
             }
 
             return rtrim($resourcesPath, '/')."/{$key}/edit";
@@ -948,7 +952,7 @@ class Form implements Renderable
             return rtrim($resourcesPath, '/')."/{$key}";
         }
 
-        return $this->request->get(Builder::PREVIOUS_URL_KEY) ?: ($this->getCurrentUrl() ?: $resourcesPath);
+        return $this->request->get(Builder::PREVIOUS_URL_KEY) ?: $this->getCurrentUrl($resourcesPath);
     }
 
     /**

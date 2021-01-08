@@ -30,20 +30,18 @@ trait HasFilter
      *
      * @param bool $toArray
      *
-     * @return array|Collection|mixed
+     * @return Collection
      */
-    public function processFilter($toArray = true)
+    public function processFilter()
     {
         $this->callBuilder();
         $this->handleExportRequest();
-
-        $this->fireOnce(new Grid\Events\Fetching($this));
 
         $this->applyQuickSearch();
         $this->applyColumnFilter();
         $this->applySelectorQuery();
 
-        return $this->filter->execute($toArray);
+        return $this->filter->execute();
     }
 
     /**
