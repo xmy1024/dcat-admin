@@ -587,7 +587,6 @@ class Form implements Renderable
 
         return $this->sendResponse(
             $this->response()
-                ->alert()
                 ->status($status)
                 ->message($message)
                 ->redirectIf($status, $this->resource(-1))
