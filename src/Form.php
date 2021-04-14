@@ -589,6 +589,7 @@ class Form implements Renderable
             $this->response()
                 ->status($status)
                 ->message($message)
+	            ->refresh()
         );
     }
 
