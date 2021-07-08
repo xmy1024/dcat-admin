@@ -92,6 +92,11 @@ class Tree implements Renderable
     /**
      * @var bool
      */
+    public $expand = true;
+
+    /**
+     * @var bool
+     */
     public $useQuickCreate = true;
 
     /**
@@ -262,6 +267,16 @@ class Tree implements Renderable
     }
 
     /**
+     * @param bool $value
+     *
+     * @return void
+     */
+    public function expand(bool $value = true)
+    {
+        $this->expand = $value;
+    }
+
+    /**
      * Disable create.
      *
      * @param bool $value
@@ -273,9 +288,19 @@ class Tree implements Renderable
         $this->useCreate = ! $value;
     }
 
+    public function showCreateButton(bool $value = true)
+    {
+        return $this->disableCreateButton(! $value);
+    }
+
     public function disableQuickCreateButton(bool $value = true)
     {
         $this->useQuickCreate = ! $value;
+    }
+
+    public function showQuickCreateButton(bool $value = true)
+    {
+        return $this->disableQuickCreateButton(! $value);
     }
 
     /**
@@ -303,6 +328,11 @@ class Tree implements Renderable
         $this->useSave = ! $value;
     }
 
+    public function showSaveButton(bool $value = true)
+    {
+        return $this->disableSaveButton(! $value);
+    }
+
     /**
      * Disable refresh.
      *
@@ -315,11 +345,21 @@ class Tree implements Renderable
         $this->useRefresh = ! $value;
     }
 
+    public function showRefreshButton(bool $value = true)
+    {
+        return $this->disableRefreshButton(! $value);
+    }
+
     public function disableQuickEditButton(bool $value = true)
     {
         $this->actions(function (Actions $actions) use ($value) {
             $actions->disableQuickEdit($value);
         });
+    }
+
+    public function showQuickEditButton(bool $value = true)
+    {
+        return $this->disableQuickEditButton(! $value);
     }
 
     public function disableEditButton(bool $value = true)
@@ -329,11 +369,21 @@ class Tree implements Renderable
         });
     }
 
+    public function showEditButton(bool $value = true)
+    {
+        return $this->disableEditButton(! $value);
+    }
+
     public function disableDeleteButton(bool $value = true)
     {
         $this->actions(function (Actions $actions) use ($value) {
             $actions->disableDelete($value);
         });
+    }
+
+    public function showDeleteButton(bool $value = true)
+    {
+        return $this->disableDeleteButton(! $value);
     }
 
     /**
@@ -497,6 +547,7 @@ class Tree implements Renderable
             'nestableOptions' => $this->nestableOptions,
             'url'             => $this->url,
             'resolveAction'   => $this->resolveAction(),
+            'expand'          => $this->expand,
         ];
     }
 

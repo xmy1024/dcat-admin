@@ -7,24 +7,31 @@
     </button>
     <ul class="dropdown-menu" role="menu">
         @foreach($actions as $action)
-            <li class="dropdown-item">
-                {!! $action->render() !!}
-            </li>
+            @if ($action instanceof Dcat\Admin\Grid\Tools\ActionDivider)
+                <li class="dropdown-divider"></li>
+            @else
+                <li class="dropdown-item">
+                    {!! $action->render() !!}
+                </li>
+            @endif
         @endforeach
     </ul>
 </div>
 @endif
 
 <script>
-$(document).off('change', '.{{ $parent->getRowName() }}-checkbox').on('change', '.{{ $parent->getRowName() }}-checkbox', function () {
-    var btn = $('.{{ $selectAllName }}-btn'), selected = Dcat.grid.selectedRows('{{ $parent->getName() }}').length;
-    if (selected) {
-        btn.show()
-    } else {
-        btn.hide()
-    }
-    setTimeout(function () {
-        btn.find('.selected').html("{!! trans('admin.grid_items_selected') !!}".replace('{n}', selected));
-    }, 50)
-});
+Dcat.init('.{{ $parent->getRowName() }}-checkbox', function ($this) {
+    $this.on('change', function () {
+        var btn = $('.{{ $selectAllName }}-btn'), selected = Dcat.grid.selectedRows('{{ $parent->getName() }}').length;
+
+        if (selected) {
+            btn.show()
+        } else {
+            btn.hide()
+        }
+        setTimeout(function () {
+            btn.find('.selected').html("{!! trans('admin.grid_items_selected') !!}".replace('{n}', selected));
+        }, 50)
+    })
+})
 </script>

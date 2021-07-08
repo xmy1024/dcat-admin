@@ -189,6 +189,17 @@ class HasMany extends Field
 
         $newInput += $input;
 
+        if ($hasManyRules = $this->getRules()) {
+            if (! Arr::has($input, $this->column)) {
+                return false;
+            }
+
+            $newInput += $this->sanitizeInput($input, $this->column);
+
+            $newRules[$this->column] = $hasManyRules;
+            $attributes[$this->column] = $this->label;
+        }
+
         return Validator::make($newInput, $newRules, array_merge($this->getValidationMessages(), $messages), $attributes);
     }
 
@@ -511,7 +522,7 @@ class HasMany extends Field
         }
 
         // specify a view to render.
-        $this->view = $this->views[$this->viewMode];
+        $this->view = $this->view ?: $this->views[$this->viewMode];
 
         $this->addVariables([
             'forms'          => $this->buildRelatedForms(),
@@ -562,7 +573,7 @@ class HasMany extends Field
         $template .= '<td class="hidden">'.implode('', $hidden).'</td>';
 
         // specify a view to render.
-        $this->view = $this->views[$this->viewMode];
+        $this->view = $this->view ?: $this->views[$this->viewMode];
 
         $this->addVariables([
             'headers'      => $headers,

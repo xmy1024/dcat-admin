@@ -42,8 +42,9 @@ export default class AddFile {
                 `);
 
             $btns = $(`
-<span style="right: 45px;" class="file-action d-none" data-file-act='order' data-order="1"><i class='feather icon-arrow-up'></i></span>
-<span style="right: 25px;" class="file-action d-none" data-file-act='order' data-order="0"><i class='feather icon-arrow-down'></i></span>
+<span style="right: 65px;" class="file-action d-none" data-file-act='order' data-order="1"><i class='feather icon-arrow-up'></i></span>
+<span style="right: 45px;" class="file-action d-none" data-file-act='order' data-order="0"><i class='feather icon-arrow-down'></i></span>
+<span style="right: 25px;" class="file-action d-none" data-file-act='download' data-id=''><i class='feather icon-download-cloud'></i></span>
 <span data-file-act="cancel" class="file-action" style="font-size:13px">
     <i class="feather icon-x red-dark"></i>
 </span>
@@ -81,21 +82,21 @@ export default class AddFile {
     // 显示错误信息
     showError ($li, code, file) {
         let _this = this,
-            __ = _this.uploader.lang.trans,
+            lang = _this.uploader.lang,
             text = '',
             $info = $('<p class="error"></p>');
 
         switch (code) {
             case 'exceed_size':
-                text = __('exceed_size');
+                text = lang.trans('exceed_size');
                 break;
 
             case 'interrupt':
-                text = __('interrupt');
+                text = lang.trans('interrupt');
                 break;
 
             default:
-                text = __('upload_failed');
+                text = lang.trans('upload_failed');
                 break;
         }
 
@@ -159,7 +160,7 @@ export default class AddFile {
         let _this = this,
             parent = _this.uploader;
 
-        return function (cur, prev) {
+        return function (cur, prev, a) {
             if (prev === 'progress') {
                 // $prgress.hide().width(0);
             } else if (prev === 'queued') {
@@ -235,6 +236,10 @@ export default class AddFile {
                     $(this).attr('data-id', file.serverId);
 
                     helper.orderFiles($(this));
+
+                    break;
+                case 'download':
+                    window.open($(this).attr('data-id'));
 
                     break;
             }

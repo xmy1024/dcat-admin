@@ -29,6 +29,15 @@ export default class Menu {
 
             $(this).addClass('active')
         });
+
+        // 启用sidebar_collapsed模式后点击菜单自动缩进
+        $('.sidebar-collapse .main-sidebar .nav-item .nav-link[href]').on('click', function () {
+            var href = $(this).attr('href');
+
+            if (href !== '#' && href !== 'javascript:void(0)') {
+                $('.sidebar-collapse .main-sidebar').removeClass('sidebar-focused');
+            }
+        });
     }
 
     initHorizontal() {
@@ -53,5 +62,38 @@ export default class Menu {
             $this.parents('.dropdown').find('.nav-link').eq(0).addClass('active');
             $this.parents('.dropdown-submenu').find('.nav-link').eq(0).addClass('active')
         });
+
+        // 自动计算高度
+        let $horizontalMenu = $('.horizontal-menu .main-horizontal-sidebar'),
+            defaultHorizontalMenuHeight = 0,
+            horizontalMenuTop = 0;
+
+        // 重新计算高度
+        let resize = function () {
+            if (! $('.horizontal-menu').length) {
+                return;
+            }
+
+            if (! defaultHorizontalMenuHeight) {
+                defaultHorizontalMenuHeight = $horizontalMenu.height()
+            }
+
+            if (! horizontalMenuTop) {
+                horizontalMenuTop = $horizontalMenu.offset().top + 15;
+            }
+
+            let height = $horizontalMenu.height(),
+                diff = height - defaultHorizontalMenuHeight,
+                $wrapper = $('.horizontal-menu.navbar-fixed-top .content-wrapper');
+
+            if (height <= defaultHorizontalMenuHeight) {
+                return $wrapper.css({'padding-top': horizontalMenuTop + 'px'});
+            }
+
+            $wrapper.css({'padding-top': (horizontalMenuTop + diff) + 'px'});
+        };
+        window.onresize = resize;
+
+        resize();
     }
 }

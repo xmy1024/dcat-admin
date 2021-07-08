@@ -13,7 +13,9 @@ use Dcat\Admin\Layout\Menu;
 use Dcat\Admin\Layout\Navbar;
 use Dcat\Admin\Layout\SectionManager;
 use Dcat\Admin\Support\Context;
+use Dcat\Admin\Support\Helper;
 use Dcat\Admin\Support\Setting;
+use Dcat\Admin\Support\Translator;
 use Dcat\Admin\Support\WebUploader;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
@@ -46,6 +48,7 @@ class AdminServiceProvider extends ServiceProvider
         Console\ExtensionEnableCommand::class,
         Console\ExtensionDiableCommand::class,
         Console\ExtensionUpdateCommand::class,
+        Console\UpdateCommand::class,
     ];
 
     /**
@@ -211,7 +214,7 @@ class AdminServiceProvider extends ServiceProvider
         }, true);
     }
 
-    protected function registerServices()
+    public function registerServices()
     {
         $this->app->singleton('admin.app', Application::class);
         $this->app->singleton('admin.asset', Asset::class);
@@ -232,14 +235,15 @@ class AdminServiceProvider extends ServiceProvider
         });
         $this->app->singleton('admin.web-uploader', WebUploader::class);
         $this->app->singleton(ExceptionHandler::class, config('admin.exception_handler') ?: Handler::class);
+        $this->app->singleton('admin.translator', Translator::class);
     }
 
-    protected function registerExtensions()
+    public function registerExtensions()
     {
         Admin::extension()->register();
     }
 
-    protected function bootExtensions()
+    public function bootExtensions()
     {
         Admin::extension()->boot();
     }
@@ -271,8 +275,8 @@ PHP;
 
         // register middleware group.
         foreach ($this->middlewareGroups as $key => $middleware) {
-            if ($disablePermission && $middleware == 'admin.permission') {
-                continue;
+            if ($disablePermission) {
+                Helper::deleteByValue($middleware, 'admin.permission', true);
             }
             $router->middlewareGroup($key, $middleware);
         }

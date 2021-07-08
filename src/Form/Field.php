@@ -12,6 +12,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
 /**
@@ -335,13 +336,31 @@ class Field implements Renderable
             $value = [];
 
             foreach ($this->column as $key => $column) {
-                $value[$key] = Arr::get($data, $this->normalizeColumn($column));
+                $value[$key] = $this->getValueFromData($data, $this->normalizeColumn($column));
             }
 
             return $value;
         }
 
-        return Arr::get($data, $this->normalizeColumn(), $this->value);
+        return $this->getValueFromData($data, null, $this->value);
+    }
+
+    /**
+     * @param array $data
+     * @param string $column
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    protected function getValueFromData($data, $column = null, $default = null)
+    {
+        $column = $column ?: $this->normalizeColumn();
+
+        if (Arr::has($data, $column)) {
+            return Arr::get($data, $column, $default);
+        }
+
+        return Arr::get($data, Str::snake($column), $default);
     }
 
     protected function normalizeColumn(?string $column = null)
@@ -537,7 +556,7 @@ class Field implements Renderable
      *
      * @param null $value
      *
-     * @return mixed
+     * @return mixed|$this
      */
     public function value($value = null)
     {
@@ -784,6 +803,12 @@ class Field implements Renderable
      */
     public function readOnly(bool $value = true)
     {
+        if (! $value) {
+            unset($this->attributes['readonly']);
+
+            return $this;
+        }
+
         return $this->attribute('readonly', $value);
     }
 
@@ -796,6 +821,12 @@ class Field implements Renderable
      */
     public function disable(bool $value = true)
     {
+        if (! $value) {
+            unset($this->attributes['disabled']);
+
+            return $this;
+        }
+
         return $this->attribute('disabled', $value);
     }
 
@@ -809,12 +840,20 @@ class Field implements Renderable
     public function placeholder($placeholder = null)
     {
         if ($placeholder === null) {
-            return $this->placeholder ?: trans('admin.input').' '.$this->label;
+            return $this->placeholder ?: $this->defaultPlaceholder();
         }
 
         $this->placeholder = $placeholder;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    protected function defaultPlaceholder()
+    {
+        return trans('admin.input').' '.$this->label;
     }
 
     /**
@@ -911,12 +950,34 @@ class Field implements Renderable
      * Set element class.
      *
      * @param string|array $class
+     * @param bool $normalize
      *
      * @return $this
      */
-    public function setElementClass($class)
+    public function setElementClass($class, bool $normalize = true)
     {
-        $this->elementClass = array_merge($this->elementClass, (array) $this->normalizeElementClass($class));
+        if ($normalize) {
+            $class = $this->normalizeElementClass($class);
+        }
+
+        $this->elementClass = array_merge($this->elementClass, (array) $class);
+
+        return $this;
+    }
+
+    /**
+     * Add element class.
+     *
+     * @param string|array $class
+     * @param bool $normalize
+     *
+     * @return $this
+     */
+    public function addElementClass($class, bool $normalize = false)
+    {
+        $this->setElementClass($class, $normalize);
+
+        $this->elementClass = array_values(array_unique(array_merge($this->elementClass, $this->getDefaultElementClass())));
 
         return $this;
     }
@@ -1025,22 +1086,6 @@ class Field implements Renderable
     protected function getFormElementId()
     {
         return $this->form ? $this->form->getElementId() : null;
-    }
-
-    /**
-     * Add the element class.
-     *
-     * @param $class
-     *
-     * @return $this
-     */
-    public function addElementClass($class)
-    {
-        $this->elementClass = array_unique(
-            array_merge($this->elementClass, (array) $class)
-        );
-
-        return $this;
     }
 
     /**
