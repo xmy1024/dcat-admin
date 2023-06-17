@@ -109,6 +109,7 @@ export default class AddFile {
     showImage($li, file) {
         let _this = this,
             uploader = _this.uploader.uploader,
+            lang = _this.uploader.lang,
             $wrap = $li.find('p.imgWrap');
 
         var image = uploader.makeThumb(file, function (error, src) {
@@ -138,7 +139,7 @@ export default class AddFile {
 
                 // 验证图片宽高
                 if (! _this.validateDimensions(file)) {
-                    Dcat.error('The image dimensions is invalid.');
+                    Dcat.error(lang.trans('dimensions') || 'The image dimensions is invalid.');
 
                     uploader.removeFile(file);
 
@@ -229,7 +230,7 @@ export default class AddFile {
 
                     break;
                 case 'preview':
-                    Dcat.helpers.previewImage(parent.$wrapper.find('img').attr('src'), null, file.name);
+                    Dcat.helpers.previewImage($(this).parent().parent().find('img').attr('src'), null, file.name);
 
                     break;
                 case 'order':

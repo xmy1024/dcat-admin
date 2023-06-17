@@ -177,6 +177,9 @@ class Asset
         '@sortable' => [
             'js' => '@admin/dcat/plugins/sortable/Sortable.min.js',
         ],
+        '@autocomplete' => [
+            'js' => '@admin/dcat/plugins/autocomplete/jquery.autocomplete.min.js',
+        ],
     ];
 
     /**
@@ -286,9 +289,8 @@ class Asset
     /**
      * 设置或获取别名.
      *
-     * @param string|array $name
-     * @param string|array $value
-     *
+     * @param  string|array  $name
+     * @param  string|array  $value
      * @return void|array
      */
     public function alias($name, $value = null)
@@ -315,9 +317,8 @@ class Asset
     /**
      * 获取别名.
      *
-     * @param string $name
-     * @param array $params
-     *
+     * @param  string  $name
+     * @param  array  $params
      * @return array|string
      */
     public function getAlias($name, array $params = [])
@@ -344,9 +345,8 @@ class Asset
     }
 
     /**
-     * @param array $files
-     * @param array $params
-     *
+     * @param  array  $files
+     * @param  array  $params
      * @return array
      */
     protected function normalizeAliasPaths($files, array $params)
@@ -369,8 +369,7 @@ class Asset
     /**
      * 解析参数.
      *
-     * @param string $name
-     *
+     * @param  string  $name
      * @return array
      */
     protected function parseParams($name)
@@ -389,9 +388,8 @@ class Asset
     /**
      * 根据别名设置需要载入的js和css脚本.
      *
-     * @param string|array $alias
-     * @param array $params
-     *
+     * @param  string|array  $alias
+     * @param  array  $params
      * @return void
      */
     public function require($alias, array $params = [])
@@ -413,7 +411,7 @@ class Asset
     /**
      * 设置需要载入的css脚本.
      *
-     * @param string|array $css
+     * @param  string|array  $css
      */
     public function css($css)
     {
@@ -429,7 +427,7 @@ class Asset
     /**
      * 设置需要载入的基础css脚本.
      *
-     * @param array $css
+     * @param  array  $css
      */
     public function baseCss(array $css, bool $merge = false)
     {
@@ -443,7 +441,7 @@ class Asset
     /**
      * 设置需要载入的js脚本.
      *
-     * @param string|array $js
+     * @param  string|array  $js
      */
     public function js($js)
     {
@@ -459,9 +457,8 @@ class Asset
     /**
      * 根据别名获取资源路径.
      *
-     * @param string $path
-     * @param string $type
-     *
+     * @param  string  $path
+     * @param  string  $type
      * @return string|array|null
      */
     public function get($path, string $type = 'js')
@@ -486,8 +483,7 @@ class Asset
     /**
      * 获取静态资源完整URL.
      *
-     * @param string $path
-     *
+     * @param  string  $path
      * @return string
      */
     public function url($path)
@@ -508,8 +504,7 @@ class Asset
     /**
      * 获取真实路径.
      *
-     * @param string|null $path
-     *
+     * @param  string|null  $path
      * @return string|null
      */
     public function getRealPath(?string $path)
@@ -536,8 +531,7 @@ class Asset
     /**
      * 判断是否是路径别名.
      *
-     * @param mixed $value
-     *
+     * @param  mixed  $value
      * @return bool
      */
     public function isPathAlias($value)
@@ -549,7 +543,6 @@ class Asset
      * 判断别名是否存在.
      *
      * @param $value
-     *
      * @return bool
      */
     public function hasAlias($value)
@@ -560,8 +553,7 @@ class Asset
     /**
      * 判断是否含有别名.
      *
-     * @param string $value
-     *
+     * @param  string  $value
      * @return bool
      */
     protected function containsAlias($value)
@@ -572,7 +564,7 @@ class Asset
     /**
      * 设置在head标签内加载的js.
      *
-     * @param string|array $js
+     * @param  string|array  $js
      */
     public function headerJs($js, bool $merge = true)
     {
@@ -586,8 +578,8 @@ class Asset
     /**
      * 设置基础js脚本.
      *
-     * @param array $js
-     * @param bool $merge
+     * @param  array  $js
+     * @param  bool  $merge
      */
     public function baseJs(array $js, bool $merge = true)
     {
@@ -601,8 +593,8 @@ class Asset
     /**
      * 设置js代码.
      *
-     * @param string|array $script
-     * @param bool         $direct
+     * @param  string|array  $script
+     * @param  bool  $direct
      */
     public function script($script, bool $direct = false)
     {
@@ -619,7 +611,7 @@ class Asset
     /**
      * 设置css代码.
      *
-     * @param string $style
+     * @param  string  $style
      */
     public function style($style)
     {
@@ -684,8 +676,7 @@ class Asset
     }
 
     /**
-     * @param string $url
-     *
+     * @param  string  $url
      * @return string
      */
     public function withVersionQuery($url)
